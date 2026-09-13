@@ -22,6 +22,8 @@ Windows: clone to `%LOCALAPPDATA%\hermes\plugins\pixel-office` instead.
 
 ## Install the desktop pane
 
+Works on **macOS, Linux, and Windows**.
+
 ### One command (macOS / Linux / WSL / git-bash on Windows)
 
 ```bash
@@ -33,6 +35,10 @@ curl -fsSL https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-emb
 ```powershell
 iwr -useb https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-embedded/main/install.ps1 | iex
 ```
+
+Both scripts auto-detect the right Hermes home for the platform
+(`~/.hermes` on macOS/Linux, `%LOCALAPPDATA%\hermes` on Windows — or
+`$HERMES_HOME`/`%HERMES_HOME%` if you use a named profile).
 
 The installer checks whether the backend plugin is already present and
 tells you if it's missing — it only ever touches `desktop-plugins/`.
