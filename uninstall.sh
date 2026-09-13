@@ -10,7 +10,6 @@ else
 fi
 
 echo "Removing from: $HOME_DIR"
-rm -rf "$HOME_DIR/plugins/pixel-office"
 rm -rf "$HOME_DIR/desktop-plugins/pixel-office-view"
 
-echo "✅ Removed. Remove 'pixel-office' from plugins.enabled in $HOME_DIR/config.yaml if present, then relaunch Hermes."
+echo "✅ Removed the desktop pane. The backend plugin (pixel-office), if installed, is untouched."

@@ -1,25 +1,26 @@
-# Hermes Pixel Office — Embedded
+# Hermes Pixel Office — Embedded Desktop Pane
 
-A pixel-art virtual office for [Hermes Agent](https://github.com/NousResearch/hermes-agent) —
-every agent session and every `delegate_task` subagent becomes an animated
-pixel character at a desk. This repo packages the original
-[`teknium1/hermes-pixel-office`](https://github.com/teknium1/hermes-pixel-office)
-backend **plus a desktop pane** that docks it live inside the Hermes app
-itself — no separate browser tab required.
+Docks the live [Hermes Pixel Office](https://github.com/teknium1/hermes-pixel-office)
+inside the Hermes desktop app itself — as a real pane, no separate browser
+tab. Also adds a statusbar chip showing the live agent count.
 
 ![office](screenshot.png)
 
-## What you get
+This repo is **just the desktop pane**. It talks to the existing
+`hermes-pixel-office` backend plugin (the one that watches lifecycle hooks
+and serves `http://127.0.0.1:8113`) — install that first if you don't have
+it yet.
 
-- **Backend plugin** (`plugins/pixel-office`) — the original hermes-pixel-office
-  server: watches lifecycle hooks (tool calls, sessions, subagents, approvals)
-  and serves a live office page + JSON state at `http://127.0.0.1:8113`.
-- **Embedded desktop pane** (`desktop-plugins/pixel-office-view`) — docks that
-  same live office directly inside the Hermes desktop app as a pane, plus a
-  statusbar chip showing the live agent count. No demo data, no browser —
-  just your real sessions.
+## Prerequisite: the backend plugin
 
-## Install
+```bash
+git clone https://github.com/teknium1/hermes-pixel-office ~/.hermes/plugins/pixel-office
+hermes config set plugins.enabled '["pixel-office"]'
+```
+
+Windows: clone to `%LOCALAPPDATA%\hermes\plugins\pixel-office` instead.
+
+## Install the desktop pane
 
 ### One command (macOS / Linux / WSL / git-bash on Windows)
 
@@ -33,62 +34,38 @@ curl -fsSL https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-emb
 iwr -useb https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-embedded/main/install.ps1 | iex
 ```
 
+The installer checks whether the backend plugin is already present and
+tells you if it's missing — it only ever touches `desktop-plugins/`.
+
 Then:
 
-1. **Fully quit and relaunch** the Hermes desktop app (plugins load at process
-   start — an already-running session won't pick it up).
+1. **Fully quit and relaunch** the Hermes desktop app (plugins load at
+   process start — an already-running session won't pick it up).
 2. Do anything in a session. The office starts serving on the first event.
-3. Look for the **"PIXEL OFFICE"** pane, docked live in the app.
+3. Look for the **"PIXEL OFFICE"** pane, docked live in the app, plus an
+   `office (N)` chip in the statusbar.
 
 ## Manual install
 
 ```bash
-# Backend
-git clone https://github.com/mistrysiddh/hermes-pixel-office-embedded /tmp/pixel-office-src
-cp -r /tmp/pixel-office-src/{__init__.py,plugin.yaml,demo_feed.py,LICENSE,web} \
-  ~/.hermes/plugins/pixel-office/    # or $HERMES_HOME/plugins/pixel-office/
-
-# Desktop pane
 mkdir -p ~/.hermes/desktop-plugins/pixel-office-view
-cp /tmp/pixel-office-src/desktop-plugins/pixel-office-view/plugin.js \
-  ~/.hermes/desktop-plugins/pixel-office-view/
-
-hermes config set plugins.enabled '["pixel-office"]'
+curl -fsSL https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-embedded/main/desktop-plugins/pixel-office-view/plugin.js \
+  -o ~/.hermes/desktop-plugins/pixel-office-view/plugin.js
 ```
 
 Windows: same idea, Hermes home is usually `%LOCALAPPDATA%\hermes`.
 
 ## What you'll see
 
-- One character per Hermes session (CLI, Telegram, Discord, cron, desktop, …) —
-  characters walk in, sit at a desk, and walk out when the session ends.
-- Gold-collared characters are `delegate_task` subagents, labeled by goal.
-- Activity animations: typing (`write_file`/`patch`), reading (`read_file`/
-  `search_files`), browsing (web tools), terminal work (green monitor
-  flicker), delegating (pointing).
-- Dangerous-command approvals: red "!" speech bubble + "needs input!" +
-  header counter.
-- Optional sound toggle (chime on approval-needed / subagent-finished).
-- Sessions from ALL Hermes processes on the machine share one office.
-- **This fork:** the same live office, docked as a native pane inside the
-  desktop app — plus a statusbar chip with the live agent count.
+- Same live office as the standalone page — real sessions, real subagents,
+  real activity animations (typing, reading, browsing, terminal, delegating),
+  approval flags — just docked inside the app instead of a browser tab.
+- A statusbar chip (`🟢 office (N)`) showing the live agent count; click it
+  for a quick toast.
 
-Visual only: the plugin observes lifecycle hooks — it never blocks, vetoes,
-or transforms anything, adds zero model-tool footprint, and does not touch
-the prompt cache.
-
-## Configuration (optional)
-
-`~/.hermes/config.yaml`:
-
-```yaml
-plugins:
-  enabled:
-    - pixel-office
-  entries:
-    pixel-office:
-      port: 8113        # change if something else owns 8113
-```
+Visual only — the pane just embeds the existing office page via an iframe
+and polls `/state` for the chip. It never blocks, vetoes, or transforms
+anything Hermes does.
 
 ## Uninstall
 
@@ -99,14 +76,16 @@ curl -fsSL https://raw.githubusercontent.com/mistrysiddh/hermes-pixel-office-emb
 or manually:
 
 ```bash
-rm -rf ~/.hermes/plugins/pixel-office ~/.hermes/desktop-plugins/pixel-office-view
-# then remove "pixel-office" from plugins.enabled in config.yaml
+rm -rf ~/.hermes/desktop-plugins/pixel-office-view
 ```
+
+This only removes the pane — the backend plugin is untouched.
 
 ## Credits
 
-Backend plugin is [teknium1/hermes-pixel-office](https://github.com/teknium1/hermes-pixel-office),
-MIT licensed. The embedded desktop pane is an addition on top of it.
+The office itself — backend, hook watching, sprite rendering — is
+[teknium1/hermes-pixel-office](https://github.com/teknium1/hermes-pixel-office),
+MIT licensed. This repo just adds a desktop pane that embeds it.
 
 ## License
 
