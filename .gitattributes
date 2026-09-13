@@ -1,0 +1,6 @@
+# Force LF line endings for shell scripts, regardless of platform checkout settings.
+# Prevents "bad interpreter" failures when macOS/Linux users run ./install.sh directly.
+*.sh text eol=lf
+install.ps1 text eol=crlf
+*.js text eol=lf
+*.md text eol=lf
