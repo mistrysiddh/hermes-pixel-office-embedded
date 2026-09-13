@@ -23,7 +23,12 @@ DESKTOP_PLUGIN_DIR="$HOME_DIR/desktop-plugins/pixel-office-view"
 mkdir -p "$PLUGIN_DIR" "$DESKTOP_PLUGIN_DIR"
 
 echo "→ Cloning backend plugin (pixel-office)..."
-TMP_DIR=$(mktemp -d)
+if [ -n "${LOCALAPPDATA:-}" ]; then
+  TMP_DIR="$LOCALAPPDATA/Temp/pixel-office-install-$$"
+else
+  TMP_DIR=$(mktemp -d)
+fi
+rm -rf "$TMP_DIR"
 git clone --depth 1 "$REPO_URL" "$TMP_DIR" >/dev/null 2>&1
 
 cp "$TMP_DIR/__init__.py" "$PLUGIN_DIR/"
