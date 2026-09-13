@@ -24,7 +24,14 @@ New-Item -ItemType Directory -Force -Path $DesktopPluginDir | Out-Null
 $TmpDir = Join-Path $env:TEMP ("pixel-office-view-" + [guid]::NewGuid())
 
 Write-Host "-> Cloning desktop pane..."
-git clone --depth 1 $RepoUrl $TmpDir 2>$null | Out-Null
+$PrevEAP = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+git clone --depth 1 --quiet $RepoUrl $TmpDir 2>&1 | Out-Null
+$ErrorActionPreference = $PrevEAP
+if (-not (Test-Path "$TmpDir\desktop-plugins\pixel-office-view\plugin.js")) {
+    Write-Error "git clone failed -- is git installed and on PATH?"
+    exit 1
+}
 Copy-Item "$TmpDir\desktop-plugins\pixel-office-view\plugin.js" $DesktopPluginDir -Force
 Remove-Item -Recurse -Force $TmpDir
 
@@ -36,7 +43,7 @@ if (Test-Path (Join-Path $HomeDir "plugins\pixel-office")) {
     Write-Host "plugin (serves http://127.0.0.1:8113) -- install it first:" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "  git clone https://github.com/teknium1/hermes-pixel-office `"$HomeDir\plugins\pixel-office`""
-    Write-Host "  hermes config set plugins.enabled '[\`"pixel-office\`"]'"
+    Write-Host "  hermes config set plugins.enabled '[""pixel-office""]'"
     Write-Host ""
     Write-Host "Desktop pane installed." -ForegroundColor Green
 }
