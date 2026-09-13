@@ -17,6 +17,32 @@ else
   HOME_DIR="$HOME/.hermes"
 fi
 
+echo "Hermes Pixel Office — Embedded Desktop Pane"
+echo ""
+echo "This will install a desktop plugin into:"
+echo "  $HOME_DIR/desktop-plugins/pixel-office-view/"
+echo ""
+echo "It docks the live hermes-pixel-office office as a pane inside the"
+echo "Hermes desktop app. Requires the hermes-pixel-office backend plugin"
+echo "separately (the installer will tell you if it's missing)."
+echo ""
+
+# Prompt when a real terminal is attached to /dev/tty (works even through
+# `curl | bash`, where stdin is the piped script, not the user's keyboard).
+# Skips automatically in non-interactive contexts (CI, scripts), with
+# PIXEL_OFFICE_YES=1 set, or when /dev/tty exists but can't actually be
+# opened (seen on some git-bash/MSYS builds on Windows).
+if [ -z "${PIXEL_OFFICE_YES:-}" ] && { exec 3<>/dev/tty; } 2>/dev/null; then
+  read -r -p "Proceed with install? [Y/n] " REPLY <&3
+  exec 3<&-
+  case "$REPLY" in
+    [nN]*)
+      echo "Aborted — nothing was installed."
+      exit 0
+      ;;
+  esac
+fi
+
 echo "Installing into: $HOME_DIR"
 
 DESKTOP_PLUGIN_DIR="$HOME_DIR/desktop-plugins/pixel-office-view"

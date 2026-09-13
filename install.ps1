@@ -16,6 +16,24 @@ if ($env:HERMES_HOME) {
     $HomeDir = Join-Path $env:LOCALAPPDATA "hermes"
 }
 
+Write-Host "Hermes Pixel Office -- Embedded Desktop Pane"
+Write-Host ""
+Write-Host "This will install a desktop plugin into:"
+Write-Host "  $HomeDir\desktop-plugins\pixel-office-view\"
+Write-Host ""
+Write-Host "It docks the live hermes-pixel-office office as a pane inside the"
+Write-Host "Hermes desktop app. Requires the hermes-pixel-office backend plugin"
+Write-Host "separately (the installer will tell you if it's missing)."
+Write-Host ""
+
+if (-not $env:PIXEL_OFFICE_YES -and [Environment]::UserInteractive -and -not ([Console]::IsInputRedirected)) {
+    $Reply = Read-Host "Proceed with install? [Y/n]"
+    if ($Reply -match '^[nN]') {
+        Write-Host "Aborted -- nothing was installed."
+        exit 0
+    }
+}
+
 Write-Host "Installing into: $HomeDir"
 
 $DesktopPluginDir = Join-Path $HomeDir "desktop-plugins\pixel-office-view"
